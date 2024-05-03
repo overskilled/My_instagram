@@ -1,23 +1,8 @@
-# Welcome to My Instagram
-***
+# React + Vite
 
-## Task
-TODO - What is the problem? And where is the challenge?
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Description
-TODO - How have you solved the problem?
+Currently, two official plugins are available:
 
-## Installation
-TODO - How to install your project? npm install? make? make re?
-
-## Usage
-TODO - How does it work?
-```
-./my_project argument1 argument2
-```
-
-### The Core Team
-
-
-<span><i>Made at <a href='https://qwasar.io'>Qwasar SV -- Software Engineering School</a></i></span>
-<span><img alt='Qwasar SV -- Software Engineering School's Logo' src='https://storage.googleapis.com/qwasar-public/qwasar-logo_50x50.png' width='20px' /></span>
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
