@@ -1,11 +1,14 @@
-import { Avatar, Box, Flex, Link, Tooltip } from '@chakra-ui/react'
+import { Avatar, Box, Button, Flex, Link, Tooltip } from '@chakra-ui/react'
 import React from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import { CreatePostLogo, InstagramLogo, InstagramMobileLogo, NotificationsLogo, SearchLogo } from '../../assets/constants'
 import { AiFillHome } from 'react-icons/ai'
 import { BiLogOut } from 'react-icons/bi'
+import useLogOut from '../../hooks/useLogOut'
 
 const Sidebar = () => {
+
+    const { handleLogout, isLoggingOut, error } = useLogOut()
 
     const sidebarItems = [
         {
@@ -28,7 +31,7 @@ const Sidebar = () => {
         {
             icon: <Avatar size={'sm'} name='Yvan Ouatedem' src='profilepic.png' />,
             text: "Profile",
-            link: "/",
+            link: "/yvan_ouatedem",
         }
     ]
 
@@ -95,10 +98,8 @@ const Sidebar = () => {
                     openDelay={500}
                     display={{ base: 'block', md: 'none' }}
                 >
-                    <Link
-                        display={"flex"}
-                        to={'/auth'}
-                        as={RouterLink}
+                    <Flex
+                        onClick={handleLogout}
                         alignItems={"center"}
                         gap={4}
                         _hover={{ bg: "whiteAlpha.400" }}
@@ -107,11 +108,15 @@ const Sidebar = () => {
                         mt={'auto'}
                         w={{ base: 10, md: 'full' }}
                     >
-                        {<BiLogOut size={25}/>}
-                        <Box display={{ base: 'none', md: "block" }}>
+                        {<BiLogOut size={25} />}
+                        <Button display={{ base: 'none', md: "block" }}
+                            variant={"ghost"}
+                            _hover={{ bg: "transparent"}}
+                            isLoading={isLoggingOut}
+                        >
                             Logout
-                        </Box>
-                    </Link>
+                        </Button>
+                    </Flex>
                 </Tooltip>
             </Flex>
         </Box>

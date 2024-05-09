@@ -8,20 +8,7 @@ import SuggestedUsers from '../../components/SuggestedUsers/SuggestedUsers'
 
 
 const Home = () => {
-    const { currentUser, logout } = useAuth()
-    const [error, setError] = useState('')
-    const navigate = useNavigate()
-
-    async function handleLogout() {
-        setError('')
-
-        try {
-            await logout()
-            navigate("/")
-        } catch (error) {
-            setError("Failed to log out")
-        }
-    }
+    const { currentUser } = useAuth()
 
     return (
         <Container maxW={'container.lg'}>
