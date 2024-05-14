@@ -37,7 +37,7 @@ const ProfileHeader = () => {
                             </Button>
                         </Flex>
                     )}
-                    {!visitingOwnProfileAndAuth && (
+                    {visitingAnotherProfileandAuth && (
                         <Flex gap={4} alignItems={"center"} justifyContent={"center"}>
                             <Button
                                 bg={"blue.500"}
@@ -47,7 +47,7 @@ const ProfileHeader = () => {
                                 onClick={handleFollowUser}
                                 isLoading={isUpdating}
                             >
-                                {isFollowing ? "unFollow" : "Follow"}
+                                {isFollowing ? "Unfollow" : "Follow"}
                             </Button>
                         </Flex>
                     )}
