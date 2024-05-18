@@ -1,7 +1,6 @@
 import { Box, Button, Container, Flex } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
-import { useNavigate } from 'react-router-dom'
 import FeedPosts from '../../components/FeedPosts/FeedPosts'
 import SuggestedUsers from '../../components/SuggestedUsers/SuggestedUsers'
 

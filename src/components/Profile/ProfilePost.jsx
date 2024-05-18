@@ -1,13 +1,50 @@
-import { Avatar, Box, Divider, Flex, GridItem, Image, Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay, Text, VStack, useDisclosure } from '@chakra-ui/react'
-import React from 'react'
+import { Avatar, Button, Divider, Flex, GridItem, Image, Modal, ModalBody, ModalCloseButton, ModalContent, ModalOverlay, Text, VStack, useDisclosure } from '@chakra-ui/react'
+import React, { useState } from 'react'
 import { AiFillHeart } from 'react-icons/ai'
 import { FaComment } from 'react-icons/fa'
 import { MdDelete } from 'react-icons/md'
 import Comment from '../Comment/Comment'
 import PostFooter from '../FeedPosts/PostFooter'
+import useUserProfileStore from '../../store/userProfileStore'
+import { firestore, storage } from '../../firebase'
+import { deleteObject, ref } from 'firebase/storage'
+import useAuthStore from '../../store/authStore'
+import { arrayRemove, deleteDoc, doc, updateDoc } from 'firebase/firestore'
+import useShowToast from '../../hooks/useShowToast'
+import usePostStore from '../../store/postStore'
 
-const ProfilePost = ({ img }) => {
+const ProfilePost = ({ post }) => {
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const { userProfile } = useUserProfileStore()
+    const { user } = useAuthStore()
+    const showToast = useShowToast()
+    const [isDeleting, setIsDeleting] = useState(false)
+    const { deletePost } = usePostStore()
+    const deletePostFromProfile = useUserProfileStore((state) => state.deletePost)
+    console.log(post)
+
+    const handleDeletePost = async () => {
+        if (!window.confirm("Are you sure you want to delete this post?")) return;
+        if (isDeleting) return;
+
+        try {
+            const imageRef = ref(storage, `posts/${post.id}`)
+            await deleteObject(imageRef)
+            const userRef = doc(firestore, "users", user.uid)
+            await deleteDoc(doc(firestore, "posts", post.id))
+
+            await updateDoc(userRef, {
+                posts: arrayRemove(post.id)
+            })
+
+            deletePost(post.id)
+            deletePostFromProfile(post.id)
+            showToast("Success", "Post deleted successfull")
+
+        } catch (error) {
+            showToast("Error", error.message, "error")
+        }
+    }
 
 
     return (
@@ -42,19 +79,19 @@ const ProfilePost = ({ img }) => {
                         <Flex>
                             <AiFillHeart size={20} />
                             <Text fontWeight={"bold"} ml={2}>
-                                7
+                                {post.likes.length}
                             </Text>
                         </Flex>
                         <Flex>
                             <FaComment size={20} />
                             <Text fontWeight={"bold"} ml={2}>
-                                7
+                                {post.comments.length}
                             </Text>
                         </Flex>
                     </Flex>
                 </Flex>
 
-                <Image src={img} alt='post image' objectFit={"cover"} w={"100%"} h={"100%"} />
+                <Image src={post.imageURL} alt='post image' objectFit={"cover"} w={"100%"} h={"100%"} />
             </GridItem>
 
             <Modal isOpen={isOpen} onClose={onClose}
@@ -70,33 +107,41 @@ const ProfilePost = ({ img }) => {
                             gap={4}
                             w={{ base: "90%", sm: "70%", md: "full" }}
                             mx={"auto"}
+                            maxH={"90vh"}
+                            minH={"60vh"}
                         >
-                            <Box
+                            <Flex
                                 borderRadius={4}
                                 overflow={"hidden"}
                                 border={"1px solid"}
                                 borderColor={"whiteAlpha.300"}
                                 flex={1.5}
+                                justifyContent={"center"}
+                                alignItems={"center"}
                             >
-                                <Image src={img} alt='profile post' />
-                            </Box>
+                                <Image src={post.imageURL} alt='profile post' />
+                            </Flex>
                             <Flex flex={1} flexDirection={"column"} px={10} display={{ base: "none", md: "flex" }}>
 
                                 <Flex alignItems={"center"} justifyContent={"space-between"}>
                                     <Flex gap={4} alignItems={"center"}>
-                                        <Avatar src='/img2.png' size={"sm"} name='Yvan Ouatedem' />
+                                        <Avatar src={userProfile.profilePicURL} size={"sm"} name={userProfile.username} />
                                         <Text fontWeight={"bold"} fontSize={12}>
-                                            Yvan Ouatedem
+                                            {userProfile.username}
                                         </Text>
                                     </Flex>
 
-                                    <Box
-                                        _hover={{ bg: "whiteAlpha.300", color: "red.600" }}
-                                        borderRadius={4}
-                                        p={1}
-                                    >
-                                        <MdDelete size={20} cursor={"pointer"} />
-                                    </Box>
+                                    {user?.uid === userProfile.uid && (
+                                        <Button
+                                            _hover={{ bg: "whiteAlpha.300", color: "red.600" }}
+                                            borderRadius={4}
+                                            p={1}
+                                            onClick={handleDeletePost}
+                                            isLoading={isDeleting}
+                                        >
+                                            <MdDelete size={20} cursor={"pointer"} />
+                                        </Button>
+                                    )}
                                 </Flex>
                                 <Divider my={5} bg={"gray.500"} />
                                 <VStack w={"full"} alignItems={"start"} maxH={"350px"} overflowY={"auto"}>

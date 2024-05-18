@@ -1,10 +1,12 @@
 import { Box, Button, Flex, Input, InputGroup, InputRightElement, Text } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { CommentLogo, NotificationsLogo, UnlikeLogo } from '../../assets/constants'
+import useUserProfileStore from '../../store/userProfileStore'
 
 const PostFooter = ({ username, isProfilePage }) => {
     const [liked, setLiked] = useState(false)
     const [likes, setLikes] = useState(1000)
+    const { userProfile } = useUserProfileStore()
 
     const handleLike = () => {
         if (liked) {
