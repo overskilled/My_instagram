@@ -19,7 +19,7 @@ function App() {
             </Route>
             <Route path="/auth" element={<Auth />} />
           </Routes>
-        </PageLayout>
+        </PageLayout> 
       </AuthProvider>
     </>
   )
