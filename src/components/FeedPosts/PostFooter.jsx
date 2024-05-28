@@ -1,11 +1,14 @@
 import { Box, Button, Flex, Input, InputGroup, InputRightElement, Text, useDisclosure } from "@chakra-ui/react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { CommentLogo, NotificationsLogo, UnlikeLogo } from "../../assets/constants";
 import usePostComment from "../../hooks/usePostComment";
 import useAuthStore from "../../store/authStore";
 import useLikePost from "../../hooks/useLikePost";
 import { timeAgo } from "../../utils/timeAgo";
 import CommentsModal from "../Modals/CommentsModal";
+import data from '@emoji-mart/data';
+import Picker from '@emoji-mart/react';
+import { BsEmojiExpressionless } from "react-icons/bs";
 
 const PostFooter = ({ post, isProfilePage, creatorProfile }) => {
 	const { isCommenting, handlePostComment } = usePostComment();
@@ -14,11 +17,31 @@ const PostFooter = ({ post, isProfilePage, creatorProfile }) => {
 	const commentRef = useRef(null);
 	const { handleLikePost, isLiked, likes } = useLikePost(post);
 	const { isOpen, onOpen, onClose } = useDisclosure();
+	const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+	const emojiPickerRef = useRef(null);
 
 	const handleSubmitComment = async () => {
 		await handlePostComment(post.id, comment);
 		setComment("");
 	};
+
+	const addEmoji = (emoji) => {
+		setComment(comment + emoji.native);
+		setShowEmojiPicker(false)
+	};
+
+	const handleClickOutside = (event) => {
+		if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
+			setShowEmojiPicker(false);
+		}
+	};
+
+	useEffect(() => {
+		document.addEventListener("click", handleClickOutside);
+		return () => {
+			document.removeEventListener("click", handleClickOutside);
+		};
+	}, []);
 
 	return (
 		<Box mb={10} marginTop={"auto"}>
@@ -54,8 +77,7 @@ const PostFooter = ({ post, isProfilePage, creatorProfile }) => {
 							View all {post.comments.length} comments
 						</Text>
 					)}
-					{/* COMMENTS MODAL ONLY IN THE HOME PAGE */}
-					{isOpen ? <CommentsModal isOpen={isOpen} onClose={onClose} post={post} /> : null}
+					{isOpen && <CommentsModal isOpen={isOpen} onClose={onClose} post={post} />}
 				</>
 			)}
 
@@ -71,18 +93,34 @@ const PostFooter = ({ post, isProfilePage, creatorProfile }) => {
 							ref={commentRef}
 						/>
 						<InputRightElement>
-							<Button
-								fontSize={14}
-								color={"blue.500"}
-								fontWeight={600}
-								cursor={"pointer"}
-								_hover={{ color: "white" }}
-								bg={"transparent"}
-								onClick={handleSubmitComment}
-								isLoading={isCommenting}
-							>
-								Post
-							</Button>
+							<Flex>
+								<Button bgColor={"transparent"} onClick={(e) => {
+									e.preventDefault();
+									setShowEmojiPicker(!showEmojiPicker);
+								}}>
+									<BsEmojiExpressionless />
+								</Button>
+								{showEmojiPicker && (
+									<Picker
+										data={data}
+										onEmojiSelect={addEmoji}
+										showPreview={false}
+										showSkinTones={false}
+									/>
+								)}
+								<Button
+									fontSize={14}
+									color={"blue.500"}
+									fontWeight={600}
+									cursor={"pointer"}
+									_hover={{ color: "white" }}
+									bg={"transparent"}
+									onClick={handleSubmitComment}
+									isLoading={isCommenting}
+								>
+									Post
+								</Button>
+							</Flex>
 						</InputRightElement>
 					</InputGroup>
 				</Flex>
